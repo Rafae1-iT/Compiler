@@ -1,0 +1,4 @@
+1 1 int_x10 1 1
+1 3 operation / /
+1 5 operation / /
+1 7 int_x10 2 2
