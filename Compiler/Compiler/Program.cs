@@ -22,7 +22,10 @@ namespace Compiler
             {
                 StartLexer(l, "console");
             }
-            
+
+            Console.WriteLine("Нажмите любую клавишу для завершения");
+            Console.ReadKey();
+
         }
         public static void StartLexer(string path = @"../../../tests/input.txt", string pathOut = "")
         {

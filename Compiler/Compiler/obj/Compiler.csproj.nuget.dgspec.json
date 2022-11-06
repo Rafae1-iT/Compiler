@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Projects\\Compiler\\Compiler\\Compiler\\Compiler.csproj": {}
+    "D:\\GitProject\\Compiler\\Compiler\\Compiler\\Compiler.csproj": {}
   },
   "projects": {
-    "D:\\Projects\\Compiler\\Compiler\\Compiler\\Compiler.csproj": {
+    "D:\\GitProject\\Compiler\\Compiler\\Compiler\\Compiler.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Projects\\Compiler\\Compiler\\Compiler\\Compiler.csproj",
+        "projectUniqueName": "D:\\GitProject\\Compiler\\Compiler\\Compiler\\Compiler.csproj",
         "projectName": "Compiler",
-        "projectPath": "D:\\Projects\\Compiler\\Compiler\\Compiler\\Compiler.csproj",
+        "projectPath": "D:\\GitProject\\Compiler\\Compiler\\Compiler\\Compiler.csproj",
         "packagesPath": "C:\\Users\\rafae\\.nuget\\packages\\",
-        "outputPath": "D:\\Projects\\Compiler\\Compiler\\Compiler\\obj\\",
+        "outputPath": "D:\\GitProject\\Compiler\\Compiler\\Compiler\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\rafae\\AppData\\Roaming\\NuGet\\NuGet.Config",
