@@ -7,100 +7,88 @@ namespace Compiler
 {
     class MainClass
     {
-
-        public static void Main(string[] args)
+        static class Program
         {
-            Console.WriteLine("Введите '1' для запуска тестов: Лексического анализатора");
-            Console.WriteLine("Введите имя файла 'Пример: test.txt' для запуска ручново ввода, файл должен находиться в папке tests");
-            string? l = "0";
-            l = Console.ReadLine();
-            if(l == "1")
+            private static void Main(string[] args)
             {
-                Tester.StartTest();
-            } 
-            else
-            {
-                StartLexer(l, "console");
-            }
-
-            Console.WriteLine("Нажмите любую клавишу для завершения");
-            Console.ReadKey();
-
-        }
-        public static void StartLexer(string path = @"../../../tests/input.txt", string pathOut = "")
-        {
-            int lenLex = 0;
-            int numLexStart = 1;
-
-            if(pathOut == "console")
-            path = $"../../../tests/{path}";
-
-            LexicalAnalyzer.CreatTable();
-
-            List<string> ans = new List<string>();
-            int line_number = 1;
-            using (StreamReader sr = new StreamReader(path, Encoding.UTF8))
-            {
-                string? line;
-                bool endRead = false;
-                while ((line = sr.ReadLine()) != null && !endRead)
+                if (args.Length == 0)
                 {
-                    while (line.Length > 0)
-                    {
-                        string typeLex = LexicalAnalyzer.GetLex(line, ref lenLex, numLexStart);
-                        string value = LexicalAnalyzer.GetValue(line.Substring(0, lenLex), ref typeLex);
-
-                        if (typeLex == "ERROR_Overflow") // переполнение
-                        {
-                            ans.Add($"{line_number} {numLexStart} {typeLex} {value}\n");
-                            break;
-                        }
-
-                        if (typeLex == "ERROR")
-                        {
-                            ans.Add($"{line_number} {numLexStart} {typeLex}\n");
-                            endRead = true;
-                            break;
-                        }
-
-                        if (typeLex == "endFile")
-                        {
-                            ans.Add($"{line_number} {numLexStart} {typeLex} { value} { line.Substring(0, lenLex)}\n");
-                            endRead = true;
-                            break;
-                        }
-
-                        if (typeLex != "space" && typeLex != "comments")
-                        {
-                            ans.Add($"{line_number} {numLexStart} {typeLex} { value} { line.Substring(0, lenLex)}\n");
-                        }
-
-                        numLexStart = numLexStart + lenLex;
-
-                        line = line.Substring(lenLex);
-                    }
-                    line_number++;
-                    numLexStart = 1; // обновляем символ с которого начинается лексема
+                    Console.WriteLine("Options:");
+                    Console.WriteLine("  -help    Display help");
+                    //return;
                 }
-            }
-            if (pathOut != "console")
-            {
-                using (StreamWriter sw = new StreamWriter(pathOut, false, Encoding.Default))
+                LexicalAnalyzer lexer = new LexicalAnalyzer("D:/Projects/Cmp/Compiler/Compiler/test.txt");
+
+                if (args.Contains("-help"))
                 {
-                    foreach (string lineOut in ans)
+                    Console.WriteLine("Usage:");
+                    Console.WriteLine("  dotnet run [file] [options]");
+                    Console.WriteLine("Options:");
+                    Console.WriteLine("  -lexer       lexical parser");
+                    Console.WriteLine("  -sparser      simple expression parser");
+                    return;
+                }
+                try
+                {
+                    lexer = new LexicalAnalyzer(args[0]);
+                    if (args.Contains("-lexer"))
                     {
-                        sw.Write(lineOut);
+                        LexicalAnalyzer.Lex lex = lexer.GetLex();
+                        Console.Write($"{lex.line_number} {lex.numLexStart} {lex.typeLex} {lex.value} {lex.lex}\r\n");
+                        while (lex.typeLex != "Eof")
+                        {
+                            lex = lexer.GetLex();
+                            Console.Write($"{lex.line_number} {lex.numLexStart} {lex.typeLex} {lex.value} {lex.lex}\r\n");
+                        }
+                    }
+                    if (args.Contains("-sparser"))
+                    {
+                        LexicalAnalyzer lexerPar = new LexicalAnalyzer(args[0]);
+                        Parser parser = new Parser(lexerPar);
+                        Node ans = parser.ParseExpression();
+                        if (lexerPar.lastLex.typeLex != "Eof")
+                        {
+                            throw new Exception($"({lexerPar.lastLex.line_number},{lexerPar.lastLex.numLexStart}) ERROR: expected factor");
+                        }
+                        void PrintNode(Node? node, int tab = 0, bool isLeft = true)
+                        {
+                            if (node != null)
+                            {
+                                for (int i = 0; i < tab - 1; i++)
+                                {
+                                    Console.Write("    ");
+                                }
+                                if (tab > 0)
+                                {
+                                    if (isLeft)
+                                    {
+                                        Console.Write("├───");
+                                    }
+                                    else
+                                    {
+                                        Console.Write("└───");
+                                    }
+                                }
+                                tab += 1;
+                                Console.WriteLine(node.value);
+                                if (node.children.Count > 0)
+                                {
+                                    PrintNode(node.children[0], tab, true);
+                                }
+                                if (node.children.Count > 1)
+                                {
+                                    PrintNode(node.children[1], tab, false);
+                                }
+                            }
+                        }
+                        PrintNode(ans);
                     }
                 }
-            }
-            else
-            {
-                foreach (string lineOut in ans)
+                catch (Exception e)
                 {
-                    Console.Write(lineOut);
+                    Console.Write($"{e.Message}\r\n");
                 }
             }
         }
-
     }
 }

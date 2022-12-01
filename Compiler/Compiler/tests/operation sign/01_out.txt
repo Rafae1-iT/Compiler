@@ -1,4 +1,0 @@
-1 2 operation - -
-1 4 operation + +
-1 6 operation / /
-1 8 operation = =

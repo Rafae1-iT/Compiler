@@ -13,11 +13,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\GitProject\\Compiler\\Compiler\\Compiler\\Compiler.csproj",
+      "projectUniqueName": "D:\\Projects\\Cmp\\Compiler\\Compiler\\Compiler.csproj",
       "projectName": "Compiler",
-      "projectPath": "D:\\GitProject\\Compiler\\Compiler\\Compiler\\Compiler.csproj",
+      "projectPath": "D:\\Projects\\Cmp\\Compiler\\Compiler\\Compiler.csproj",
       "packagesPath": "C:\\Users\\rafae\\.nuget\\packages\\",
-      "outputPath": "D:\\GitProject\\Compiler\\Compiler\\Compiler\\obj\\",
+      "outputPath": "D:\\Projects\\Cmp\\Compiler\\Compiler\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\rafae\\AppData\\Roaming\\NuGet\\NuGet.Config",

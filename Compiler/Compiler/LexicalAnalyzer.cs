@@ -8,17 +8,57 @@ namespace Compiler
 {
     public class LexicalAnalyzer
     {
+        public struct Lex
+        {
+            public int line_number;
+            public int numLexStart;
+            public string? typeLex;
+            public string? value;
+            public string? lex;
+
+            public Lex(int line_number, int numLexStart, string? typeLex, string? value, string? lex)
+            {
+                this.line_number = line_number;
+                this.numLexStart = numLexStart;
+                this.typeLex = typeLex;
+                this.value = value;
+                this.lex = lex;
+            }
+        }
+
+        public Lex lastLex;
+
         const int countStatus = 16;
         const int countCharacters = 256;
         static int[,] table = new int[countStatus, countCharacters];
-        static string[] endFile = { "finish" };
-        static string[] keyWords = { "and", "array", "as", "asm", "begin", "case", "const",
-                                        "constructor", "destructor", "div", "do", "downto", "else", "end", "file", "for", "foreach",
-                                            "function", "goto", "implementation", "if", "in", "inherited", "inline", "interface", "label", "mod",
-                                                "nil", "not", "object", "of", "operator", "or", "packed", "procedure", "program", "record", "repeat", "self", "set",
-                                                    "shl", "shr", "string", "then", "to", "type", "unit", "until", "uses", "var", "while", "with", "xor", "dispose", "exit",
-                                                        "false", "new", "true", "as", "class", "dispinterface", "except", "exports", "finalization", "finally", "initialization",
-                                                            "inline", "is", "library", "on", "out", "packed", "property", "raise", "resourcestring", "threadvar", "try"};
+        //static string[] endFile = { "finish" };
+        static string[] keyWords = {
+            "and", "array", "as", "asm", "begin", "case", "const",
+            "constructor", "destructor", "div", "do", "downto", "else", "end", "file", "for", "foreach",
+            "function", "goto", "implementation", "if", "in", "inherited", "inline", "interface", "label", "mod",
+            "nil", "not", "object", "of", "operator", "or", "packed", "procedure", "program", "record", "repeat", "self", "set",
+            "shl", "shr", "string", "then", "to", "type", "unit", "until", "uses", "var", "while", "with", "xor", "dispose", "exit",
+            "false", "new", "true", "as", "class", "dispinterface", "except", "exports", "finalization", "finally", "initialization",
+            "inline", "is", "library", "on", "out", "packed", "property", "raise", "resourcestring", "threadvar", "try"
+        };
+        List<string> input;
+        public int numLexStart = 1;
+        public int line_number = 1;
+        public LexicalAnalyzer(string path)
+        {
+            CreatTable();
+            this.line_number = 1;
+            this.numLexStart = 1;
+            input = new List<string>();
+            using (StreamReader sr = new StreamReader(path, Encoding.UTF8))
+            {
+                string? line;
+                while ((line = sr.ReadLine()) != null)
+                {
+                    input.Add(line);
+                }
+            }
+        }
         /* 
          * 0- error (ошибка) 
          * 1- start (начальное состояние) 
@@ -37,7 +77,7 @@ namespace Compiler
          * 14- separators (разделители) 
          * 15- end (конец файла) 
          */
-        public static void CreatTable()
+        public void CreatTable()
         {
             //string 
             table[1, (int)'\''] = 2;
@@ -127,7 +167,7 @@ namespace Compiler
             table[1, (int)'['] = 14;
             table[1, (int)']'] = 14;
         }
-        public static string GetLex(string input, ref int lenLex, int numLexStart)
+        public static string GetTypeLex(string input, ref int lenLex, int numLexStart)
         {
             int k = 0;
             int statusDFA = 1;
@@ -236,7 +276,7 @@ namespace Compiler
                 }
             }
 
-            if (statusDFA == 8)
+            /*if (statusDFA == 8)
             {
                 foreach (string i in endFile)
                 {
@@ -245,62 +285,80 @@ namespace Compiler
                         statusDFA = 15;
                     }
                 }
-            }
+            }*/
 
 
             switch (statusDFA)
             {
                 case 0:
                     return "ERROR";
-                    break;
                 case 1:
                     return "ERROR";
-                    break;
                 case 2:
                     return "string";
-                    break;
                 case 3:
                     return "int_x2";
-                    break;
                 case 4:
                     return "int_x8";
-                    break;
                 case 5:
                     return "int_x10";
-                    break;
                 case 6:
                     return "int_x16";
-                    break;
                 case 7:
                     return "real_number";
-                    break;
                 case 8:
                     return "identifier";
-                    break;
                 case 9:
                     return "Key_Word";
-                    break;
                 case 10:
                     return "char";
-                    break;
                 case 11:
                     return "comments";
-                    break;
                 case 12:
                     return "space";
-                    break;
                 case 13:
                     return "operation";
-                    break;
                 case 14:
                     return "separators";
-                    break;
                 case 15:
                     return "endFile";
-                    break;
             }
 
             return "ERROR";
+        }
+        public Lex GetLex()
+        {
+            int lenLex = 0;
+            Lex lex = new Lex(line_number, numLexStart, "Eof", "Eof", "");
+            if (line_number <= input.Count)
+            {
+                string typeLex = LexicalAnalyzer.GetTypeLex(input[line_number - 1], ref lenLex, numLexStart);
+                string value = LexicalAnalyzer.GetValue(input[line_number - 1].Substring(0, lenLex), ref typeLex);
+
+                if (typeLex == "ERROR" || typeLex == "ERROR_Overflow")
+                {
+                    throw new Exception ($"({this.line_number},{numLexStart}) {typeLex}");
+                }
+
+                lex = new Lex(this.line_number, numLexStart, typeLex, value, input[line_number - 1].Substring(0, lenLex));
+
+                numLexStart = numLexStart + lenLex;
+
+                input[line_number - 1] = input[line_number - 1].Substring(lenLex);
+
+                if (input[line_number - 1].Length == 0)
+                {
+                    line_number += 1;
+                    numLexStart = 1; //обновляем символ с которого начинается лексема
+                }
+
+                while (lex.typeLex == "space" || lex.typeLex == "comments")
+                {
+                    lex = GetLex();
+                }
+            }
+            lastLex = lex;
+            return lex;
         }
 
         public static string GetValue(string lexem, ref string typeLexem)
@@ -308,13 +366,18 @@ namespace Compiler
             if (typeLexem == "int_x2")
             {
                 lexem = lexem.Replace("%", "");
-                var value = Convert.ToInt64(lexem, 2);
-                if (value > 2147483648)
+                int value;
+                try
+                {
+                    value = Convert.ToInt32(lexem, 2);
+                }
+                catch (Exception)
                 {
                     typeLexem = "ERROR_Overflow";
                     string a = "Integer";
                     return a;
                 }
+                typeLexem = "Integer";
                 return value.ToString();
 
             }
@@ -322,39 +385,54 @@ namespace Compiler
             if (typeLexem == "int_x8")
             {
                 lexem = lexem.Replace("&", "");
-                var value = Convert.ToInt64(lexem, 8);
-                if (value > 2147483648)
+                int value;
+                try
+                {
+                    value = Convert.ToInt32(lexem, 8);
+                }
+                catch (Exception)
                 {
                     typeLexem = "ERROR_Overflow";
                     string a = "Integer";
                     return a;
                 }
+                typeLexem = "Integer";
                 return value.ToString();
             }
 
             if (typeLexem == "int_x10")
             {
                 lexem = lexem.Replace("&", "");
-                var value = Convert.ToInt64(lexem, 10);
-                if (value > 2147483648)
+                int value;
+                try
+                {
+                    value = Convert.ToInt32(lexem, 10);
+                }
+                catch (Exception)
                 {
                     typeLexem = "ERROR_Overflow";
                     string a = "Integer";
                     return a;
                 }
+                typeLexem = "Integer";
                 return value.ToString();
             }
 
             if (typeLexem == "int_x16")
             {
                 lexem = lexem.Replace("$", "");
-                var value = Convert.ToInt64(lexem, 16);
-                if (value > 2147483648)
+                int value;
+                try
+                {
+                    value = Convert.ToInt32(lexem, 16);
+                }
+                catch (Exception)
                 {
                     typeLexem = "ERROR_Overflow";
                     string a = "Integer";
                     return a;
                 }
+                typeLexem = "Integer";
                 return value.ToString();
             }
 
@@ -405,11 +483,11 @@ namespace Compiler
                 return value.ToString();
             }
 
-            if (typeLexem == "endFile")
+            /*if (typeLexem == "endFile")
             {
                 var value = lexem.ToLower();
                 return value.ToString();
-            }
+            }*/
 
             return lexem;
         }

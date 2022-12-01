@@ -1,0 +1,15 @@
+C:\Users\Rafael\Desktop\Compiler\Compiler\bin\Debug\net7.0\Compiler.exe
+C:\Users\Rafael\Desktop\Compiler\Compiler\bin\Debug\net7.0\Compiler.deps.json
+C:\Users\Rafael\Desktop\Compiler\Compiler\bin\Debug\net7.0\Compiler.runtimeconfig.json
+C:\Users\Rafael\Desktop\Compiler\Compiler\bin\Debug\net7.0\Compiler.dll
+C:\Users\Rafael\Desktop\Compiler\Compiler\bin\Debug\net7.0\Compiler.pdb
+C:\Users\Rafael\Desktop\Compiler\Compiler\obj\Debug\net7.0\Compiler.csproj.AssemblyReference.cache
+C:\Users\Rafael\Desktop\Compiler\Compiler\obj\Debug\net7.0\Compiler.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Rafael\Desktop\Compiler\Compiler\obj\Debug\net7.0\Compiler.AssemblyInfoInputs.cache
+C:\Users\Rafael\Desktop\Compiler\Compiler\obj\Debug\net7.0\Compiler.AssemblyInfo.cs
+C:\Users\Rafael\Desktop\Compiler\Compiler\obj\Debug\net7.0\Compiler.csproj.CoreCompileInputs.cache
+C:\Users\Rafael\Desktop\Compiler\Compiler\obj\Debug\net7.0\Compiler.dll
+C:\Users\Rafael\Desktop\Compiler\Compiler\obj\Debug\net7.0\refint\Compiler.dll
+C:\Users\Rafael\Desktop\Compiler\Compiler\obj\Debug\net7.0\Compiler.pdb
+C:\Users\Rafael\Desktop\Compiler\Compiler\obj\Debug\net7.0\Compiler.genruntimeconfig.cache
+C:\Users\Rafael\Desktop\Compiler\Compiler\obj\Debug\net7.0\ref\Compiler.dll
