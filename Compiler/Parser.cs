@@ -10,6 +10,7 @@ namespace Compiler
     {
         BinOp,
         Var,
+        Result,
         Statemant,
         Integer,
         Real,
@@ -20,6 +21,8 @@ namespace Compiler
         Block,
         For,
         To,
+        NullStmt,
+        MainProgram,
     }
     public class Node
     {

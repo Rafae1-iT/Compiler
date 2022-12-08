@@ -32,11 +32,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\Projects\\Cmp\\Compiler\\Tester\\Tester.csproj",
+      "projectUniqueName": "D:\\GitProject\\Compiler\\Tester\\Tester.csproj",
       "projectName": "Tester",
-      "projectPath": "D:\\Projects\\Cmp\\Compiler\\Tester\\Tester.csproj",
+      "projectPath": "D:\\GitProject\\Compiler\\Tester\\Tester.csproj",
       "packagesPath": "C:\\Users\\rafae\\.nuget\\packages\\",
-      "outputPath": "D:\\Projects\\Cmp\\Compiler\\Tester\\obj\\",
+      "outputPath": "D:\\GitProject\\Compiler\\Tester\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\rafae\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -53,8 +53,8 @@
         "net6.0": {
           "targetAlias": "net6.0",
           "projectReferences": {
-            "D:\\Projects\\Cmp\\Compiler\\Compiler\\Compiler.csproj": {
-              "projectPath": "D:\\Projects\\Cmp\\Compiler\\Compiler\\Compiler.csproj"
+            "D:\\GitProject\\Compiler\\Compiler\\Compiler.csproj": {
+              "projectPath": "D:\\GitProject\\Compiler\\Compiler\\Compiler.csproj"
             }
           }
         }

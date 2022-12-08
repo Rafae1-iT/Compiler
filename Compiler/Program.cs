@@ -86,7 +86,7 @@ namespace Compiler
                     {
                         LexicalAnalyzer lexerPar = new LexicalAnalyzer(args[0]);
                         BigParser parser = new BigParser(lexerPar);
-                        Node ans = parser.ParseFor();
+                        Node ans = parser.ParseProgram();
                         if (lexerPar.lastLex.typeLex != TypeLex.Eof)
                         {
                             throw new Exception($"({lexerPar.lastLex.line_number},{lexerPar.lastLex.numLexStart}) ERROR: expected factor");
