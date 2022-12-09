@@ -1,4 +1,9 @@
 program Hello;
 begin
 a:=7;
+a:=7;
+if a>b then
+begin
+b:=a;
+end
 end.

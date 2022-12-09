@@ -40,6 +40,7 @@ namespace Compiler
             {
                 throw new Exception($"({lexer.line_number},{lexer.numLexStart - 1}) Expected .");
             }
+            NextLex();
             return new Node(TypeNode.MainProgram, $"program {name}", new List<Node> { body });
         }
         public string ParseProgramName()
@@ -125,91 +126,6 @@ namespace Compiler
             NextLex();
             return new Node(TypeNode.Statemant, currentValue, new List<Node> { var, ParseSimpleExpression()} );
         }
-
-        public Node ParseWhile()
-        {
-            if(!(currentLex.typeLex == TypeLex.Key_Word && currentLex.value == "while"))
-            {
-                throw new Exception($"({lexer.line_number},{lexer.numLexStart - 1}) Expected Key_Word");
-            }
-            NextLex();
-            Node exp = ParseExpression();
-            if (!(currentLex.typeLex == TypeLex.Key_Word && currentLex.value == "do"))
-            {
-                throw new Exception($"({lexer.line_number},{lexer.numLexStart - 1}) Expected Key_Word");
-            }
-            NextLex();
-            Node stmt = ParseStatements();
-
-            return new Node(TypeNode.While, "while", new List<Node> { exp, stmt });
-        }
-
-        public Node ParseIf()
-        {
-
-            if (!(currentLex.typeLex == TypeLex.Key_Word && currentLex.value == "if"))
-            {
-                throw new Exception($"({lexer.line_number},{lexer.numLexStart - 1}) Expected Key_Word");
-            }
-            NextLex();
-            Node exp = ParseExpression();
-
-            if (!(currentLex.typeLex == TypeLex.Key_Word && currentLex.value == "then"))
-            {
-                throw new Exception($"({lexer.line_number},{lexer.numLexStart - 1}) Expected Key_Word");
-            }
-            NextLex();
-            Node stmt = ParseStatements();
-            if (currentLex.typeLex == TypeLex.Key_Word && currentLex.value == "else")
-            {
-                NextLex();
-                Node elseStmt = new Node( TypeNode.Else, "else", new List<Node> { ParseStatements() });
-                return new Node(TypeNode.If, "if", new List<Node> { exp, stmt, elseStmt });
-            }
-
-             return new Node(TypeNode.If, "if", new List<Node> { exp, stmt });
-
-        }
-
-        public Node ParseRepeat()
-        {
-            List<Node> stmt = new List<Node> { };
-
-            if (!(currentLex.typeLex == TypeLex.Key_Word && currentLex.value == "repeat"))
-            {
-                throw new Exception($"({lexer.line_number},{lexer.numLexStart - 1}) Expected Key_Word repeat");
-            }
-            NextLex();
-
-            if (!(currentLex.typeLex == TypeLex.Key_Word && currentLex.value == "until"))
-            {
-                stmt.Add(ParseStatements());
-            }
-            while (currentLex.typeLex == TypeLex.Separators && currentLex.value == ";")
-            {
-                NextLex();
-                if (currentLex.typeLex == TypeLex.Key_Word && currentLex.value == "until")
-                {
-                    break;
-                }
-                stmt.Add(ParseSimpleStatements());
-            }
-
-            if (currentLex.typeLex == TypeLex.Key_Word && currentLex.value == "until")
-            {
-                NextLex();
-            }
-            else
-            {
-                throw new Exception($"({lexer.line_number},{lexer.numLexStart - 1}) Expected Key_Word until");
-            }
-            Node exp = ParseExpression();
-            List<Node> children = new List<Node> (stmt);
-            children.Add (exp);
-
-            return new Node(TypeNode.Repeat, "repeat", children);
-        }
-
         public Node ParseBlock()
         {
             List<Node> stmt = new List<Node> { };
@@ -249,7 +165,87 @@ namespace Compiler
             return new Node(TypeNode.Block, "begin", children);
 
         }
+        public Node ParseWhile()
+        {
+            if(!(currentLex.typeLex == TypeLex.Key_Word && currentLex.value == "while"))
+            {
+                throw new Exception($"({lexer.line_number},{lexer.numLexStart - 1}) Expected Key_Word");
+            }
+            NextLex();
+            Node exp = ParseExpression();
+            if (!(currentLex.typeLex == TypeLex.Key_Word && currentLex.value == "do"))
+            {
+                throw new Exception($"({lexer.line_number},{lexer.numLexStart - 1}) Expected Key_Word");
+            }
+            NextLex();
+            Node stmt = ParseStatements();
 
+            return new Node(TypeNode.While, "while", new List<Node> { exp, stmt });
+        }
+        public Node ParseIf()
+        {
+
+            if (!(currentLex.typeLex == TypeLex.Key_Word && currentLex.value == "if"))
+            {
+                throw new Exception($"({lexer.line_number},{lexer.numLexStart - 1}) Expected Key_Word");
+            }
+            NextLex();
+            Node exp = ParseExpression();
+
+            if (!(currentLex.typeLex == TypeLex.Key_Word && currentLex.value == "then"))
+            {
+                throw new Exception($"({lexer.line_number},{lexer.numLexStart - 1}) Expected Key_Word");
+            }
+            NextLex();
+            Node stmt = ParseStatements();
+            if (currentLex.typeLex == TypeLex.Key_Word && currentLex.value == "else")
+            {
+                NextLex();
+                Node elseStmt = new Node( TypeNode.Else, "else", new List<Node> { ParseStatements() });
+                return new Node(TypeNode.If, "if", new List<Node> { exp, stmt, elseStmt });
+            }
+
+             return new Node(TypeNode.If, "if", new List<Node> { exp, stmt });
+
+        }
+        public Node ParseRepeat()
+        {
+            List<Node> stmt = new List<Node> { };
+
+            if (!(currentLex.typeLex == TypeLex.Key_Word && currentLex.value == "repeat"))
+            {
+                throw new Exception($"({lexer.line_number},{lexer.numLexStart - 1}) Expected Key_Word repeat");
+            }
+            NextLex();
+
+            if (!(currentLex.typeLex == TypeLex.Key_Word && currentLex.value == "until"))
+            {
+                stmt.Add(ParseStatements());
+            }
+            while (currentLex.typeLex == TypeLex.Separators && currentLex.value == ";")
+            {
+                NextLex();
+                if (currentLex.typeLex == TypeLex.Key_Word && currentLex.value == "until")
+                {
+                    break;
+                }
+                stmt.Add(ParseSimpleStatements());
+            }
+
+            if (currentLex.typeLex == TypeLex.Key_Word && currentLex.value == "until")
+            {
+                NextLex();
+            }
+            else
+            {
+                throw new Exception($"({lexer.line_number},{lexer.numLexStart - 1}) Expected Key_Word until");
+            }
+            Node exp = ParseExpression();
+            List<Node> children = new List<Node> (stmt);
+            children.Add (exp);
+
+            return new Node(TypeNode.Repeat, "repeat", children);
+        }
         public Node ParseFor()
         {
             

@@ -89,7 +89,7 @@ namespace Compiler
                         Node ans = parser.ParseProgram();
                         if (lexerPar.lastLex.typeLex != TypeLex.Eof)
                         {
-                            throw new Exception($"({lexerPar.lastLex.line_number},{lexerPar.lastLex.numLexStart}) ERROR: expected factor");
+                            throw new Exception($"({lexerPar.lastLex.line_number},{lexerPar.lastLex.numLexStart}) ERROR: program is over");
                         }
                         void PrintNode(Node? node, int tab = 0, bool isLeft = true)
                         {

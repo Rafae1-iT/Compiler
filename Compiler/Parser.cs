@@ -105,7 +105,7 @@ namespace Compiler
             {
                 LexicalAnalyzer.Lex factor = currentLex;
                 currentLex = lexer.GetLex();
-                return new Node(TypeNode.Real, factor.value, new List<Node> { }); ;
+                return new Node(TypeNode.Real, factor.value, new List<Node> { });
             }
 
             throw new Exception ($"({currentLex.line_number},{currentLex.numLexStart}) ERROR: expected factor");
