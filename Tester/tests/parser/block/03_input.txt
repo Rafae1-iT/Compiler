@@ -1,4 +1,7 @@
-program Parser
-└─── begin
-    └─── begin
-        └─── begin
+program Parser;
+begin
+    begin
+        begin
+        end;
+    end;
+end.
