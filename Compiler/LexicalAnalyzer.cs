@@ -52,7 +52,7 @@ namespace Compiler
             "constructor", "destructor", "div", "do", "downto", "else", "end", "file", "for", "foreach",
             "function", "goto", "implementation", "if", "in", "inherited", "inline", "interface", "label", "mod",
             "nil", "not", "object", "of", "operator", "or", "packed", "procedure", "program", "record", "repeat", "self", "set",
-            "shl", "shr", "string", "then", "to", "type", "unit", "until", "uses", "var", "while", "with", "xor", "dispose", "exit",
+            "shl", "shr", "then", "to", "type", "unit", "until", "uses", "var", "while", "with", "xor", "dispose", "exit",
             "false", "new", "true", "as", "class", "dispinterface", "except", "exports", "finalization", "finally", "initialization",
             "inline", "is", "library", "on", "out", "packed", "property", "raise", "resourcestring", "threadvar", "try"
         };

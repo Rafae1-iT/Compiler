@@ -1,0 +1,4 @@
+program Parser;
+var a: Integer;
+begin
+end.

@@ -1,0 +1,6 @@
+program Parser
+├─── var
+    └─── :
+        ├─── a
+        └─── Integer
+└─── begin

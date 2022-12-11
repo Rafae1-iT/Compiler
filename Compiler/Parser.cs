@@ -23,6 +23,10 @@ namespace Compiler
         To,
         NullStmt,
         MainProgram,
+        Const,
+        ConstDef,
+        VarDef,
+        Type,
     }
     public class Node
     {

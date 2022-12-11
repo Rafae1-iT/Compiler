@@ -1,0 +1,4 @@
+program Parser;
+var x,y,z: integer;
+begin
+end.

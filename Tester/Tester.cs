@@ -30,6 +30,9 @@ namespace Compiler
                 case "-sparser":
                     foldersTests = new FolderTests[] { new("simple parser", 12) };
                     break;
+                case "-bparser":
+                    foldersTests = new FolderTests[] { new("parser/name", 1), new("parser/var", 8) };
+                    break;
                 default:
                     foldersTests = new FolderTests[] { };
                     break;
@@ -103,6 +106,48 @@ namespace Compiler
                                         if (node.children.Count > 1)
                                         {
                                             PrintNode(node.children[1], tab, false);
+                                        }
+                                    }
+                                }
+                                PrintNode(ans);
+                            }
+                            if (key == "-bparser")
+                            {
+                                LexicalAnalyzer lexerPar = new LexicalAnalyzer(pathIn);
+                                BigParser parser = new BigParser(lexerPar);
+                                Node ans = parser.ParseProgram();
+                                if (lexerPar.lastLex.typeLex != TypeLex.Eof)
+                                {
+                                    throw new Exception($"({lexerPar.lastLex.line_number},{lexerPar.lastLex.numLexStart}) ERROR: program is over");
+                                }
+                                void PrintNode(Node? node, int tab = 0, bool isLeft = true)
+                                {
+                                    if (node != null)
+                                    {
+                                        for (int i = 0; i < tab - 1; i++)
+                                        {
+                                            sw.Write("    ");
+                                        }
+                                        if (tab > 0)
+                                        {
+                                            if (isLeft)
+                                            {
+                                                sw.Write("├─── ");
+                                            }
+                                            else
+                                            {
+                                                sw.Write("└─── ");
+                                            }
+                                        }
+                                        tab += 1;
+                                        sw.WriteLine(node.value);
+                                        for (int i = 0; i < node.children.Count - 1; i++)
+                                        {
+                                            PrintNode(node.children[i], tab, true);
+                                        }
+                                        if (node.children.Count > 0)
+                                        {
+                                            PrintNode(node.children[^1], tab, false);
                                         }
                                     }
                                 }

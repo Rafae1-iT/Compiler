@@ -25,23 +25,24 @@ namespace Compiler
         {
             string name = "";
             List<Node> types = new List<Node>();
-            Node body;
+            List<Node> body;
             if (currentLex.typeLex == TypeLex.Key_Word && currentLex.value == "program")
             {
                 name = ParseProgramName();
             } 
-            //types = ParseDefs();
+            types = ParseDefs();
             if (currentLex.typeLex != TypeLex.Key_Word || currentLex.value != "begin")
             {
                 throw new Exception($"({lexer.line_number},{lexer.numLexStart - 1}) Expected begin");
             }
-            body = ParseBlock();
+            body = new List<Node>(types);
+            body.Add(ParseBlock());
             if (currentLex.typeLex != TypeLex.Separators || currentLex.value != ".")
             {
                 throw new Exception($"({lexer.line_number},{lexer.numLexStart - 1}) Expected .");
             }
             NextLex();
-            return new Node(TypeNode.MainProgram, $"program {name}", new List<Node> { body });
+            return new Node(TypeNode.MainProgram, $"program {name}", body);
         }
         public string ParseProgramName()
         {
@@ -60,7 +61,98 @@ namespace Compiler
             NextLex();
             return result;
         }
-
+        public List<Node> ParseDefs()
+        {
+            List<Node> types = new List<Node>();
+            while (currentLex.typeLex == TypeLex.Key_Word && (currentLex.value == "var" || currentLex.value == "procedure" || currentLex.value == "label" || currentLex.value == "const" || currentLex.value == "type"))
+            {
+                switch (currentLex.value)
+                {
+                    case "var":
+                        types.Add(ParseVar());
+                        break;
+                    case "const":
+                        types.Add(ParseConst());
+                        break;
+                    case "type":
+                        //types.Add(ParseTypeDefs());
+                        break;
+                    case "procedure":
+                        //types.Add(ParseProcedureDefs());
+                        break;
+                }
+            }
+            return types;
+        }
+        public Node ParseVar()
+        {
+            List<Node> body = new List<Node>();
+            NextLex();
+            do
+            {
+                List<Node> bodyVarDef = new List<Node>();
+                do
+                {
+                    if (currentLex.typeLex == TypeLex.Separators && currentLex.value == ",")
+                    {
+                        NextLex();
+                    }
+                    if (currentLex.typeLex != TypeLex.Identifier)
+                    {
+                        throw new Exception($"({lexer.line_number},{lexer.numLexStart - 1}) Expected Identifier" );
+                    }
+                    bodyVarDef.Add(new Node(TypeNode.Var, currentLex.value, new List<Node> { }));
+                    NextLex();
+                }
+                while (currentLex.typeLex == TypeLex.Separators && currentLex.value == ",");
+                if (!(currentLex.typeLex == TypeLex.Operation && currentLex.value == ":"))
+                {
+                    throw new Exception($"({lexer.line_number},{lexer.numLexStart - 1}) Expected ':'");
+                }
+                NextLex();
+                if (currentLex.typeLex != TypeLex.Identifier)
+                {
+                    throw new Exception($"({lexer.line_number},{lexer.numLexStart - 1}) Expected Identifier");
+                }
+                bodyVarDef.Add(new Node(TypeNode.Type, currentLex.value, new List<Node> { }));
+                NextLex();
+                body.Add(new Node(TypeNode.VarDef, ":", bodyVarDef));
+                if (!(currentLex.typeLex == TypeLex.Separators && currentLex.value == ";"))
+                {
+                    throw new Exception($"({lexer.line_number},{lexer.numLexStart - 1}) Expected ';'");
+                }
+                NextLex();
+            }
+            while (currentLex.typeLex == TypeLex.Identifier);
+            return new Node(TypeNode.Var, "var", body);
+        }
+        public Node ParseConst()
+        {
+            List<Node> body = new List<Node>();
+            NextLex();
+            if (currentLex.typeLex != TypeLex.Identifier)
+            {
+                throw new Exception($"({lexer.line_number},{lexer.numLexStart - 1}) Expected Identifier");
+            }
+            while (currentLex.typeLex == TypeLex.Identifier)
+            {
+                Node name = new Node(TypeNode.Var, currentLex.value, new List<Node> { });
+                NextLex();
+                if (!(currentLex.typeLex == TypeLex.Operation && currentLex.value == "="))
+                {
+                    throw new Exception($"({lexer.line_number},{lexer.numLexStart - 1}) Expected '='");
+                }
+                NextLex();
+                Node value = ParseExpression();
+                if (!(currentLex.typeLex == TypeLex.Separators && currentLex.value == ";"))
+                {
+                    throw new Exception($"({lexer.line_number},{lexer.numLexStart - 1}) Expected ';'");
+                }
+                body.Add(new Node(TypeNode.ConstDef, "=", new List<Node> { name, value }));
+                NextLex();
+            }
+            return new Node(TypeNode.Const, "const", body);
+        }
         public Node ParseStatements()
         {
             Node result;
@@ -116,7 +208,7 @@ namespace Compiler
             {
                 throw new Exception($"({lexer.line_number},{lexer.numLexStart - 1}) Expected identifier");
             }
-            Node var = new Node(TypeNode.Var, currentLex.value, new List<Node>()); // var - variable переменная которая выводится на экран
+            Node var = new Node(TypeNode.Var, currentLex.value, new List<Node>()); // var - переменная которая выводится на экран
             NextLex();
             if (!(currentLex.typeLex == TypeLex.Operation && (currentLex.value == ":=" || currentLex.value == "*=" || currentLex.value == "/=" || currentLex.value == "+=" || currentLex.value == "-=")))
             {
