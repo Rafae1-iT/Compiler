@@ -1,0 +1,4 @@
+program Parser;
+begin
+a -= 7;
+end.

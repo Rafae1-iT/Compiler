@@ -1,5 +1,6 @@
 program Parser;
-var x: integer;
-y: ;
+const x 777;
+y = 'Hello';
+z = 3.14;
 begin
 end.

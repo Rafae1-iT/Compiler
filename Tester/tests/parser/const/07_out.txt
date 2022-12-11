@@ -1,1 +1,1 @@
-(1,1) ERROR
+(2,11) Expected '='

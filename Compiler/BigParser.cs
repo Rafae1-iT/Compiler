@@ -267,7 +267,7 @@ namespace Compiler
             Node exp = ParseExpression();
             if (!(currentLex.typeLex == TypeLex.Key_Word && currentLex.value == "do"))
             {
-                throw new Exception($"({lexer.line_number},{lexer.numLexStart - 1}) Expected Key_Word");
+                throw new Exception($"({lexer.line_number},{lexer.numLexStart - 1}) Expected Key_Word 'do'");
             }
             NextLex();
             Node stmt = ParseStatements();
@@ -286,7 +286,7 @@ namespace Compiler
 
             if (!(currentLex.typeLex == TypeLex.Key_Word && currentLex.value == "then"))
             {
-                throw new Exception($"({lexer.line_number},{lexer.numLexStart - 1}) Expected Key_Word");
+                throw new Exception($"({lexer.line_number},{lexer.numLexStart - 1}) Expected Key_Word 'then'");
             }
             NextLex();
             Node stmt = ParseStatements();
@@ -423,6 +423,12 @@ namespace Compiler
                 return new Node(TypeNode.Var, factor.value, new List<Node> { });
             }
             if (currentLex.typeLex == TypeLex.Integer)
+            {
+                LexicalAnalyzer.Lex factor = currentLex;
+                currentLex = lexer.GetLex();
+                return new Node(TypeNode.Integer, factor.value, new List<Node> { });
+            }
+            if (currentLex.typeLex == TypeLex.String)
             {
                 LexicalAnalyzer.Lex factor = currentLex;
                 currentLex = lexer.GetLex();

@@ -1,2 +1,6 @@
-1 1 Integer 5 %101
-2 1 Eof Eof 
+program Parser
+├─── const
+    └─── =
+        ├─── r
+        └─── 3.1400000000E+000
+└─── begin

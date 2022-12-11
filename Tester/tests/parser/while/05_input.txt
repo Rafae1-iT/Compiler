@@ -1,0 +1,5 @@
+program Parser;
+begin
+    while i do j+=7;
+    while i do j+=7;
+end.

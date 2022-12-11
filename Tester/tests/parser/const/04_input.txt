@@ -1,4 +1,6 @@
 program Parser;
-var x,y,z: integer;
+const x = 777;
+const y = 'Hello';
+const z = 3.14;
 begin
 end.

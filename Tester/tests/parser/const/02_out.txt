@@ -1,2 +1,6 @@
-1 1 Integer 1 001
-2 1 Eof Eof 
+program Parser
+├─── const
+    └─── =
+        ├─── r
+        └─── Hello
+└─── begin

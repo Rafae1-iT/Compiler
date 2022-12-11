@@ -1,0 +1,8 @@
+program Parser;
+begin
+a := 'Hello';
+b += y;
+a -= 3.14;
+c *= 8;
+d /= 17;
+end.

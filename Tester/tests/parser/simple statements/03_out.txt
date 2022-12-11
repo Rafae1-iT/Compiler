@@ -1,0 +1,5 @@
+program Parser
+└─── begin
+    └─── -=
+        ├─── a
+        └─── 7

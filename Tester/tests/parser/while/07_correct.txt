@@ -1,0 +1,11 @@
+program Parser
+└─── begin
+    └─── while
+        ├─── i
+        └─── begin
+            ├─── *=
+                ├─── a
+                └─── 4
+            └─── :=
+                ├─── b
+                └─── a

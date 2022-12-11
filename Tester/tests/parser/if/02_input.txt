@@ -1,0 +1,4 @@
+program Parser;
+begin
+    if x<3 then x *= b;
+end.

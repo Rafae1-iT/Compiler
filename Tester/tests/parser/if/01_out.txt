@@ -1,0 +1,7 @@
+program Parser
+└─── begin
+    └─── if
+        ├─── x
+        └─── *=
+            ├─── x
+            └─── b

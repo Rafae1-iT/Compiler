@@ -1,5 +1,4 @@
 program Parser;
-var a: Integer;
-var b: String;
+const r = 'Hello';
 begin
 end.

@@ -1,1 +1,1 @@
-(4,0) Expected Identifier
+(2,11) Expected '='

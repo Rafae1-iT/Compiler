@@ -31,7 +31,9 @@ namespace Compiler
                     foldersTests = new FolderTests[] { new("simple parser", 12) };
                     break;
                 case "-bparser":
-                    foldersTests = new FolderTests[] { new("parser/name", 1), new("parser/var", 8) };
+                    foldersTests = new FolderTests[] { new("parser/name", 1), new("parser/var", 8), new("parser/const", 9),
+                                   new("parser/simple statements", 9), new("parser/block", 6), new("parser/while", 7),
+                                   new("parser/if", 6), new("parser/repeat", 3), new("parser/for", 4) };
                     break;
                 default:
                     foldersTests = new FolderTests[] { };

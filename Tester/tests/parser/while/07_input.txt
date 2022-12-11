@@ -1,0 +1,8 @@
+program Parser;
+begin
+    while i do 
+    begin
+    a*=4;
+    b:=a;
+    end;
+end.

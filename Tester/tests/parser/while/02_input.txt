@@ -1,0 +1,4 @@
+program Parser;
+begin
+    while i<=10 do j+=7;
+end.

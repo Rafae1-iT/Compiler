@@ -1,18 +1,6 @@
 program Parser
-├─── var
-    ├─── :
-        ├─── x
-        └─── integer
-    ├─── :
-        ├─── y
-        └─── string
-    ├─── :
-        ├─── z
-        └─── real
-    ├─── :
-        ├─── w
-        └─── boolean
-    └─── :
-        ├─── i
-        └─── char
+├─── const
+    └─── =
+        ├─── r
+        └─── 3.1400000000E+000
 └─── begin

@@ -1,0 +1,5 @@
+program Parser;
+begin
+    if x<3 then a:=4
+    else a:='Hello';
+end.

@@ -1,2 +1,1 @@
-1 1 Integer 61 &75
-2 1 Eof Eof 
+(2,7) Expected Identifier

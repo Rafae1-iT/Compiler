@@ -1,6 +1,6 @@
 program Parser
-├─── var
-    └─── :
-        ├─── a
-        └─── Integer
+├─── const
+    └─── =
+        ├─── r
+        └─── 7
 └─── begin

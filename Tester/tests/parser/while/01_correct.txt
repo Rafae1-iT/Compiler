@@ -1,0 +1,7 @@
+program Parser
+└─── begin
+    └─── while
+        ├─── i
+        └─── +=
+            ├─── j
+            └─── 7

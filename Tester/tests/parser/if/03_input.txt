@@ -1,0 +1,8 @@
+program Parser;
+begin
+    if x<3 then
+    begin
+        x*=b;
+        y:=4;
+    end;
+end.

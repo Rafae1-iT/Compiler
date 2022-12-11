@@ -1,0 +1,7 @@
+program Parser;
+begin
+    begin
+    end;
+    begin
+    end;
+end.

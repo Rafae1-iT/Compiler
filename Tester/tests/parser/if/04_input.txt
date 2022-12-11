@@ -1,0 +1,4 @@
+program Parser;
+begin
+    if then x *= b;
+end.

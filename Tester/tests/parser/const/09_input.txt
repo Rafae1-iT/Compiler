@@ -1,1 +1,6 @@
-$1a
+program Parser;
+const x = 7'Hello'7;
+y = 'Hello';
+z = 3.14;
+begin
+end.

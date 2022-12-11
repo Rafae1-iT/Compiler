@@ -1,8 +1,14 @@
 program Parser
-├─── var
-    └─── :
+├─── const
+    └─── =
         ├─── x
+        └─── 777
+├─── const
+    └─── =
         ├─── y
+        └─── Hello
+├─── const
+    └─── =
         ├─── z
-        └─── integer
+        └─── 3.1400000000E+000
 └─── begin
