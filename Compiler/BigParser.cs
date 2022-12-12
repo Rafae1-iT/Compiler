@@ -105,6 +105,7 @@ namespace Compiler
                     NextLex();
                 }
                 while (currentLex.typeLex == TypeLex.Separators && currentLex.value == ",");
+
                 if (!(currentLex.typeLex == TypeLex.Operation && currentLex.value == ":"))
                 {
                     throw new Exception($"({lexer.line_number},{lexer.numLexStart - 1}) Expected ':'");

@@ -1,0 +1,23 @@
+expression ::= simpleExp ('<' | '<=' | '>' | '>=' | '=' | '<>') simpleExp
+simpleExp ::= term { ('or' | 'xor' | '+' | '-') term }
+term ::= factor { ( 'and' | '/' | '*' ) factor }
+factor ::= '(' exp ')' | syntaxNode
+
+statement ::= [assignment | structStmt]
+structStmt ::= if | for | while | repeat | block
+
+assignment ::= var (':=' | '+=' | '-=' | '*=' | '/=') simpleExpression
+if ::= 'if' expression 'then' statement ['else' statement]
+for ::= 'for' contrlVar ':=' initialVal 'to' finalVal 'do' statement
+while ::= 'while' expression 'do' statement
+repeat ::= 'repeat' {statement ';'} 'until' expression
+block ::= 'begin' [(statement) {';' (statement)}] 'end'
+
+types ::= variables | const | typesType
+variables ::= { varDeclaration ';'}
+varDeclaration ::= identifier ':' type
+const ::= { identifier '=' ( simpleExpression | string ) ';' }
+typesType ::= { typeDeclaration ';' }
+
+type ::= 'integer' | 'real' | 'string'
+typeDeclaration ::= identifier '=' type
