@@ -1,2 +1,2 @@
-1 1 identifier aa_ aa_
+1 1 Identifier aa_ aa_
 2 1 Eof Eof 

@@ -1,2 +1,1 @@
-1 1 Integer 303 $012F
-2 1 Eof Eof 
+(1,1) Error

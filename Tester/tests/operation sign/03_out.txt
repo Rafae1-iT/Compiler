@@ -1,5 +1,5 @@
-1 1 operation : :
-1 2 operation := :=
-1 4 operation + +
-1 5 operation += +=
+1 1 Operation : :
+1 2 Operation := :=
+1 4 Operation + +
+1 5 Operation += +=
 2 1 Eof Eof 

@@ -1,2 +1,2 @@
-1 1 identifier helloIF helloIF
+1 1 Identifier helloIF helloIF
 2 1 Eof Eof 

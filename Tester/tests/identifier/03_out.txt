@@ -1,2 +1,2 @@
-1 1 identifier Aaa987 Aaa987
+1 1 Identifier Aaa987 Aaa987
 2 1 Eof Eof 

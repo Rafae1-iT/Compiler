@@ -361,8 +361,6 @@ namespace Compiler
             return new Node(TypeNode.For, "for", new List<Node> { stmt, to, stmt2 });
 
         }
-
-
         public Node ParseExpression()
         {
             Node left = ParseSimpleExpression();
@@ -374,7 +372,6 @@ namespace Compiler
             }
             return left;
         }
-
         public Node ParseSimpleExpression()
         {
             Node left = ParseTerm();
@@ -386,7 +383,6 @@ namespace Compiler
             }
             return left;
         }
-
         public Node ParseTerm()
         {
             Node left = ParseFactor();
@@ -398,7 +394,6 @@ namespace Compiler
             }
             return left;
         }
-
         public Node ParseFactor()
         {
             if (currentLex.typeLex == TypeLex.Separators && (currentLex.value == "("))
