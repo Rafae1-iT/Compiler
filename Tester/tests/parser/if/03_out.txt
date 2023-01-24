@@ -1,13 +1,1 @@
-program Parser
-└─── begin
-    └─── if
-        ├─── <
-            ├─── x
-            └─── 3
-        └─── begin
-            ├─── *=
-                ├─── x
-                └─── b
-            └─── :=
-                ├─── y
-                └─── 4
+(3,9) Undefined variable

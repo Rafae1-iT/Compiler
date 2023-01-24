@@ -1,4 +1,6 @@
 program Parser;
-label
+const x = 7;
+var  y: integer;
 begin
+  y := x;
 end.

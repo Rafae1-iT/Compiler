@@ -1,18 +1,1 @@
-program Parser
-├─── var
-    ├─── :
-        ├─── x
-        └─── integer
-    ├─── :
-        ├─── y
-        └─── string
-    ├─── :
-        ├─── z
-        └─── real
-    ├─── :
-        ├─── w
-        └─── boolean
-    └─── :
-        ├─── i
-        └─── char
-└─── begin
+(5,10) Unable to cast object of type 'Compiler.Symbol' to type 'Compiler.SymType'.

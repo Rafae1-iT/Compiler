@@ -1,1 +1,1 @@
-(3,12) Expected Key_Word 'then'
+(3,9) Undefined variable

@@ -1,6 +1,1 @@
-program Parser
-├─── var
-    └─── :
-        ├─── a
-        └─── Integer
-└─── begin
+(2,14) Unable to cast object of type 'Compiler.Symbol' to type 'Compiler.SymType'.

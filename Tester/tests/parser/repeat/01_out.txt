@@ -1,14 +1,1 @@
-program Parser
-└─── begin
-    └─── repeat
-        ├─── :=
-            ├─── x
-            └─── +
-                ├─── a
-                └─── b
-        ├─── :=
-            ├─── b
-            └─── x
-        └─── >
-            ├─── i
-            └─── 100
+(4,5) Undefined variable

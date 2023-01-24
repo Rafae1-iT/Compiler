@@ -20,11 +20,7 @@ namespace Compiler
 
                 if (args.Contains("-help"))
                 {
-                    Console.WriteLine("Usage:");
-                    Console.WriteLine("  dotnet run [file] [options]");
-                    Console.WriteLine("Options:");
-                    Console.WriteLine("  -lexer       lexical parser");
-                    Console.WriteLine("  -sparser      simple expression parser");
+                    Help();
                     return;
                 }
                 try
@@ -129,6 +125,16 @@ namespace Compiler
                 {
                     Console.Write($"{e.Message}\r\n");
                 }
+            }
+
+            private static void Help()
+            {
+                Console.WriteLine("Usage:");
+                Console.WriteLine("  dotnet run [file] [options]");
+                Console.WriteLine("Options:");
+                Console.WriteLine("  -lexer       lexical parser");
+                Console.WriteLine("  -sparser      simple expression parser");
+                return;
             }
         }
     }

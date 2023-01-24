@@ -1,1 +1,1 @@
-(1,7) ERROR: expected factor
+Unable to cast object of type 'Compiler.Node' to type 'Compiler.SymVar'.

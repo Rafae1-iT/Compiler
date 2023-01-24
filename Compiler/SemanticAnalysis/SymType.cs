@@ -26,17 +26,4 @@ namespace Compiler
     {
         public SymBoolean(string name, Node node) : base(name, node) { }
     }
-
-    public class SymTypeAlias : SymType
-    {
-        SymType original;
-        public SymType GetOriginalType()
-        {
-            return original;
-        }
-        public SymTypeAlias(string name, SymType original, Node node) : base(name, node)
-        {
-            this.original = original;
-        }
-    }
 }

@@ -1,5 +1,1 @@
-*
-├─── 3
-└─── +
-    ├─── 5
-    └─── a
+Unable to cast object of type 'Compiler.Node' to type 'Compiler.SymVar'.

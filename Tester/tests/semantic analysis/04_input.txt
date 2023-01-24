@@ -1,0 +1,6 @@
+program Parser;
+var  x,z: integer;
+y: string;
+begin
+z := x + y;
+end.

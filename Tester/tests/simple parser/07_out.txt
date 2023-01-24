@@ -1,1 +1,1 @@
-(2,1) ERROR: don't have ')'
+Unable to cast object of type 'Compiler.Node' to type 'Compiler.SymVar'.

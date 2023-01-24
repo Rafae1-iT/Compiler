@@ -1,9 +1,1 @@
-program Parser
-└─── begin
-    └─── while
-        ├─── i
-        └─── while
-            ├─── j
-            └─── +=
-                ├─── i
-                └─── 4
+(3,13) Undefined variable

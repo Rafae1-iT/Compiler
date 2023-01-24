@@ -1,0 +1,5 @@
+program Parser;
+var  x: integer;
+begin
+y := 5;
+end.

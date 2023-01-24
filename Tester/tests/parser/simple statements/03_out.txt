@@ -1,5 +1,1 @@
-program Parser
-└─── begin
-    └─── -=
-        ├─── a
-        └─── 7
+(3,1) Undefined variable

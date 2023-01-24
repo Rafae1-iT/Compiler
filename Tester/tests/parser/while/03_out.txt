@@ -1,1 +1,1 @@
-(3,17) Expected Key_Word 'do'
+(3,12) Undefined variable

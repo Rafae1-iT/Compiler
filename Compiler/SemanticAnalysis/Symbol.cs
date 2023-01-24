@@ -20,20 +20,14 @@ namespace Compiler
     }
     public class SymVar : Symbol
     {
-        SymType type;
+        public SymType symType;
         public SymType GetTypeVar()
         {
-            SymType buildsType = type;
-            while (buildsType.GetType().Name == "SymTypeAlias")
-            {
-                SymTypeAlias symTypeAlias = (SymTypeAlias)buildsType;
-                buildsType = symTypeAlias.GetOriginalType();
-            }
-            return buildsType;
+            return symType;
         }
         public SymVar(string name, SymType type, Node node) : base(name, node)
         {
-            this.type = type;
+            this.symType = type;
         }
     }
     public class SymVarConst : SymVar
@@ -43,9 +37,5 @@ namespace Compiler
     public class SymVarGlobal : SymVar
     {
         public SymVarGlobal(string name, SymType type, Node node) : base(name, type, node) { }
-    }
-    public class SymVarLocal : SymVar
-    {
-        public SymVarLocal(string name, SymType type, Node node) : base(name, type, node) { }
     }
 }

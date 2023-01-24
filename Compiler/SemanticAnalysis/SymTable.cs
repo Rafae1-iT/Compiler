@@ -19,11 +19,7 @@ namespace Compiler
         }
         public void Add(string name, Symbol value)
         {
-            if (data.TryAdd(name, value))
-            {
-                return;
-            }
-            else
+            if (!data.TryAdd(name, value))
             {
                 throw new Exception($"Duplicate identifier \"{name}\"");
             }
@@ -32,23 +28,16 @@ namespace Compiler
         {
             Symbol value;
             Symbol? check;
-            if (data.TryGetValue(name, out check))
-            {
-                value = check;
-                return value;
-            }
-            else
+            if (!data.TryGetValue(name, out check))
             {
                 throw new Exception("Variable not declared");
             }
+            value = check;
+            return value;
         }
         public SymTable(Dictionary<string, Symbol> data)
         {
             this.data = data;
-        }
-        public SymTable(SymTable original)
-        {
-            this.data = new Dictionary<string, Symbol>(original.data);
         }
     }
     public class SymTableStack
@@ -62,10 +51,6 @@ namespace Compiler
         {
             tables.Add(table);
         }
-        public void PopBack()
-        {
-            tables.RemoveAt(tables.Count - 1);
-        }
         public void Add(string name, Symbol value)
         {
             try
@@ -77,11 +62,11 @@ namespace Compiler
                 throw new Exception($"Duplicate identifier \"{name}\"");
             }
         }
-        public Symbol? Get(string name)
+        public Symbol Get(string name)
         {
-            Symbol? res = null;
+            Symbol res = new Symbol("", new Node(TypeNode.NullStmt, "", new List<Node>())); // для return
             bool decl = false;
-            for (int i = tables.Count - 1; i >= 0; i--)
+            for (int i = tables.Count - 1; i >= 0; i--) // пробежать по стеку снизу вверх
             {
                 try
                 {

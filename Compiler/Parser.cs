@@ -6,44 +6,8 @@ using System.Threading.Tasks;
 
 namespace Compiler
 {
-    public enum TypeNode
-    {
-        BinOp,
-        Var,
-        Result,
-        Statemant,
-        Integer,
-        Real,
-        While,
-        If,
-        Else,
-        Repeat,
-        Block,
-        For,
-        To,
-        NullStmt,
-        MainProgram,
-        Const,
-        ConstDef,
-        VarDef,
-        Type,
-    }
-    public class Node
-    {
-        public TypeNode type;
-        public string value;
-        public List<Node> children;
-        public Node(TypeNode type, string value, List<Node> children)
-        {
-            this.type = type;
-            this.value = value;
-            this.children = children;
-        }
-
-    }
     public class Parser
     {
-
         LexicalAnalyzer lexer;
         public LexicalAnalyzer.Lex currentLex;
         public Parser(LexicalAnalyzer l)
@@ -88,7 +52,7 @@ namespace Compiler
                 } 
                 else
                 {
-                    throw new Exception ($"({currentLex.line_number},{currentLex.numLexStart}) ERROR: don't have ')'");
+                    throw new Exception ($"({currentLex.line_number},{currentLex.numLexStart}) don't have ')'");
                 }
                 return e;
             }
@@ -112,7 +76,7 @@ namespace Compiler
                 return new Node(TypeNode.Real, factor.value, new List<Node> { });
             }
 
-            throw new Exception ($"({currentLex.line_number},{currentLex.numLexStart}) ERROR: expected factor");
+            throw new Exception ($"({currentLex.line_number},{currentLex.numLexStart}) expected factor");
         }
     }
 }
