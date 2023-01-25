@@ -62,9 +62,20 @@ namespace Compiler
                 throw new Exception($"Duplicate identifier \"{name}\"");
             }
         }
+        public void PopBack()
+        {
+            tables.RemoveAt(tables.Count - 1);
+        }
+        public void FindDuplicate(string name)
+        {
+            if (GetBackTable().GetData().ContainsKey(name))
+            {
+                throw new Exception($"Duplicate identifier \"{name}\"");
+            }
+        }
         public Symbol Get(string name)
         {
-            Symbol res = new Symbol("", new Node(TypeNode.NullStmt, "", new List<Node>())); // для return
+            Symbol res = new Symbol(""); // для return
             bool decl = false;
             for (int i = tables.Count - 1; i >= 0; i--) // пробежать по стеку снизу вверх
             {

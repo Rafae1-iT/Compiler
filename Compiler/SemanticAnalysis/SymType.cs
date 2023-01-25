@@ -8,22 +8,18 @@ namespace Compiler
 {
     public class SymType : Symbol
     {
-        public SymType(string name, Node node) : base(name, node) { }
+        public SymType(string name) : base(name) { }
     }
     public class SymInteger : SymType
     {
-        public SymInteger(string name, Node node) : base(name, node) { }
+        public SymInteger(string name) : base(name) { }
     }
     public class SymReal : SymType
     {
-        public SymReal(string name, Node node) : base(name, node) { }
+        public SymReal(string name) : base(name) { }
     }
     public class SymString : SymType
     {
-        public SymString(string name, Node node) : base(name, node) { }
-    }
-    public class SymBoolean : SymType
-    {
-        public SymBoolean(string name, Node node) : base(name, node) { }
+        public SymString(string name) : base(name) { }
     }
 }

@@ -17,9 +17,9 @@ namespace Compiler
             lexer = l;
             currentLex = lexer.GetLex();
             Dictionary<string, Symbol> builts = new Dictionary<string, Symbol>();
-            builts.Add("integer", new SymInteger("integer", new Node(TypeNode.Type, "integer", new List<Node> { })));
-            builts.Add("string", new SymString("string", new Node(TypeNode.Type, "string", new List<Node> { })));
-            builts.Add("real", new SymReal("real", new Node(TypeNode.Type, "real", new List<Node> { })));
+            builts.Add("integer", new SymInteger("integer"));
+            builts.Add("string", new SymString("string"));
+            builts.Add("real", new SymReal("real"));
             symTableStack.AddTable(new SymTable(builts));
         }
         void NextLex()
@@ -27,61 +27,63 @@ namespace Compiler
             currentLex = lexer.GetLex();
         }
 
-        private void Require(TypeLex typeLex, string value)
+        private void Require(object value)
         {
-            if (currentLex.typeLex != typeLex || currentLex.value != value)
+            if (!Equals(currentLex.value, value))
             {
-                throw new Exception($"({lexer.line_number},{lexer.numLexStart - 1}) Expected '{value}'");
+                throw new Exception($"({lexer.line_number},{lexer.numLexStart - 1}) Expected {value}, but met {currentLex.value}");
             }
         }
         private void Require(TypeLex typeLex)
         {
             if (currentLex.typeLex != typeLex)
             {
-                throw new Exception($"({lexer.line_number},{lexer.numLexStart - 1}) Expected {typeLex}");
+                throw new Exception($"({lexer.line_number},{lexer.numLexStart - 1}) Expected {typeLex}, but met {currentLex.typeLex} ({currentLex.value})");
             }
         }
 
-        public Node ParseProgram()
+        public NodeMainProgram ParseMainProgram()
         {
             string name = "";
-            List<Node> types = new List<Node>();
-            List<Node> body;
-            if (currentLex.typeLex == TypeLex.Key_Word && currentLex.value == "program")
+            List<NodeDefs> types = new List<NodeDefs>();
+            BlockStmt body;
+            if ((currentLex.value is KeyWord keyWrd) && (keyWrd == KeyWord.PROGRAM))
             {
                 name = ParseProgramName();
             } 
             types = ParseDefs();
-            Require(TypeLex.Key_Word, "begin");
-            body = new List<Node>(types);
-            body.Add(ParseBlock());
-            Require(TypeLex.Separators, ".");
+            Require(KeyWord.BEGIN);
+            body = ParseBlock();
+            Require(Separator.Point);
             NextLex();
-            return new Node(TypeNode.MainProgram, $"program {name}", body);
+            return new NodeMainProgram(name, types, body);
         }
         public string ParseProgramName()
         {
             string result;
             NextLex();
             Require(TypeLex.Identifier);
-            result = currentLex.value;
+            result = (string)currentLex.value;
             NextLex();
-            Require(TypeLex.Separators, ";");
+            Require(Separator.Semiсolon);
             NextLex();
             return result;
         }
-        public List<Node> ParseDefs()
+        public List<NodeDefs> ParseDefs()
         {
-            List<Node> types = new List<Node>();
+            List<NodeDefs> types = new List<NodeDefs>();
             while (currentLex.typeLex == TypeLex.Key_Word)
             {
                 switch (currentLex.value)
                 {
-                    case "var":
+                    case KeyWord.VAR:
                         types.Add(ParseVar());
                         continue;
-                    case "const":
+                    case KeyWord.CONST:
                         types.Add(ParseConst());
+                        continue;
+                    case KeyWord.PROCEDURE:
+                        types.Add(ParseProcedure());
                         continue;
                     default:
                         return types;
@@ -89,291 +91,399 @@ namespace Compiler
             }
             return types;
         }
-        public Node ParseVar()
+        public VarDefsNode ParseVar(bool inProcedureDeclaration = false)
         {
-            List<Node> body = new List<Node>();
+            List<VarDeclarationNode> body = new List<VarDeclarationNode>();
             NextLex();
             do
             {
-                List<Node> bodyVarDef = new List<Node>();
+                List<string> varNames = new List<string>();
+                List<SymVar> bodyVarDef = new List<SymVar>();
                 SymType symType;
                 do
                 {
-                    if (currentLex.typeLex == TypeLex.Separators && currentLex.value == ",")
+                    if ((currentLex.value is Separator sep) && (sep == Separator.Comma))
                     {
                         NextLex();
                     }
                     Require(TypeLex.Identifier);
-                    bodyVarDef.Add(new Node(TypeNode.Var, currentLex.value, new List<Node> { }));
+                    varNames.Add((string)currentLex.value);
                     NextLex();
                 }
-                while (currentLex.typeLex == TypeLex.Separators && currentLex.value == ",");
+                while ((currentLex.value is Separator sep2) && (sep2 == Separator.Comma));
 
-                Require(TypeLex.Operation, ":");
+                Require(OperationSign.Colon);
                 NextLex();
                 Require(TypeLex.Identifier);
                 try
                 {
-                    symType = (SymType)symTableStack.Get(currentLex.value);
-                    bodyVarDef.Add(symType); // нужно для общего типа объвленных переменных
+                    symType = (SymType)symTableStack.Get((string)currentLex.value);
                 }
                 catch (Exception ex)
                 {
                     throw new Exception($"({lexer.line_number},{lexer.numLexStart - 1}) {ex.Message}");
                 }
-                NextLex();
-                body.Add(new Node(TypeNode.VarDef, ":", bodyVarDef));
-                Require(TypeLex.Separators, ";");
-                for (int i = 0; i < bodyVarDef.Count - 1; i++)
+                if (!inProcedureDeclaration)
                 {
-                    symTableStack.Add(bodyVarDef[i].value, new SymVarGlobal(bodyVarDef[i].value, symType, bodyVarDef[i])); // добавление в таблицу с типом
+                    NextLex();
+                    Require(Separator.Semiсolon);
                 }
+                for (int i = 0; i < varNames.Count; i++)
+                {
+                    bodyVarDef.Add(new SymVar(varNames[i], symType));
+                    if (inProcedureDeclaration) symTableStack.Add(varNames[i], new SymVarLocal(varNames[i], symType)); // добавление в таблицу с типом
+                    else symTableStack.Add(varNames[i], new SymVarGlobal(varNames[i], symType));
+                }
+                body.Add(new VarDeclarationNode(bodyVarDef, symType));
                 NextLex();
             }
             while (currentLex.typeLex == TypeLex.Identifier);
-            return new Node(TypeNode.Var, "var", body);
+            return new VarDefsNode(body);
         }
-        public Node ParseConst()
+        public NodeDefs ParseConst()
         {
-            List<Node> body = new List<Node>();
+            List<ConstDeclarationNode> body = new List<ConstDeclarationNode>();
             NextLex();
             Require(TypeLex.Identifier);
             while (currentLex.typeLex == TypeLex.Identifier)
             {
-                Node name = new Node(TypeNode.Var, currentLex.value, new List<Node> { });
+                string name = (string)currentLex.value;
                 NextLex();
-                Require(TypeLex.Operation, "=");
+                Require(OperationSign.Equal);
                 NextLex();
-                Node value = ParseExpression();
-                Require(TypeLex.Separators, ";");
-                body.Add(new Node(TypeNode.ConstDef, "=", new List<Node> { name, value }));
+                NodeExpression value = ParseExpression();
+                Require(Separator.Semiсolon);
+
+                SymVarConst symVarConst = new SymVarConst(name, value.GetCachedType());
+                symTableStack.Add(name, symVarConst); // добавление в таблицу с типом
+
+                body.Add(new ConstDeclarationNode(symVarConst, value ));
                 NextLex();
             }
-            return new Node(TypeNode.Const, "const", body);
+            return new ConstDefsNode(body);
         }
-        public Node ParseStatements()
+        public NodeDefs ParseProcedure()
         {
-            Node result;
+            string name;
+            VarDefsNode paramsNode = new VarDefsNode(new List<VarDeclarationNode>());
+            SymTable locals = new SymTable(new Dictionary<string, Symbol>());
+            List<SymVar> args = new List<SymVar>();
+            NextLex();
+            Require(TypeLex.Identifier);
+            name = (string)currentLex.value;
+            symTableStack.FindDuplicate(name);
+            NextLex();
+            symTableStack.AddTable(locals);
+            if ((currentLex.value is Separator sep) && (sep == Separator.OpenParenthesis))
+            {
+                paramsNode = ParseVar(inProcedureDeclaration: true);
+                Require(Separator.CloseParenthesis);
+                NextLex();
+            }
+            Require(Separator.Semiсolon);
+            NextLex();
+            foreach (VarDeclarationNode varDeclNode in paramsNode.body)
+            {
+                foreach (SymVar var in varDeclNode.GetVars())
+                {
+                    args.Add(var);
+                }
+            }
+            List<NodeDefs> localsTypes = ParseDefs();
+            locals = symTableStack.GetBackTable();
+            BlockStmt body = ParseBlock();
+            Require(Separator.Semiсolon);
+            NextLex();
+            symTableStack.PopBack();
+            SymProc symProc = new SymProc(name, args, locals, body);
+            symTableStack.Add(name, symProc);
+            return new ProcedureDefNode(paramsNode, localsTypes, symProc);
+        }
+        public NodeStatement ParseStatements()
+        {
+            NodeStatement result;
             if (currentLex.typeLex == TypeLex.Identifier)
             {
-                result = ParseAssigment();
+                result = ParseAssigmentOrCall();
             }
             else
             {
                 //structStmt
-                if (currentLex.typeLex == TypeLex.Key_Word || (currentLex.typeLex == TypeLex.Separators && currentLex.value == ";"))
+                switch (currentLex.value)
                 {
-                    switch (currentLex.value)
-                    {
-                        case "begin":
-                            result = ParseBlock();
-                            break;
-                        case "if":
-                            result = ParseIf();
-                            break;
-                        case "for":
-                            result = ParseFor();
-                            break;
-                        case "while":
-                            result = ParseWhile();
-                            break;
-                        case "repeat":
-                            result = ParseRepeat();
-                            break;
-                        case ";":
-                            result = new Node(TypeNode.NullStmt, "", new List<Node>());
-                            break;
-                        default:
-                            throw new Exception($"({lexer.line_number},{lexer.numLexStart - 1}) Expected statements");
-                    }
-                }
-                else
-                {
-                    throw new Exception($"({lexer.line_number},{lexer.numLexStart - 1}) Expected statements");
+                    case KeyWord.BEGIN:
+                        result = ParseBlock();
+                        break;
+                    case KeyWord.IF:
+                        result = ParseIf();
+                        break;
+                    case KeyWord.FOR:
+                        result = ParseFor();
+                        break;
+                    case KeyWord.WHILE:
+                        result = ParseWhile();
+                        break;
+                    case KeyWord.REPEAT:
+                        result = ParseRepeat();
+                        break;
+                    case Separator.Semiсolon:
+                        result = new NullStmt();
+                        break;
+                    default:
+                        throw new Exception($"({lexer.line_number},{lexer.numLexStart - 1}) Expected statements");
                 }
             }
             return result;
         }
-        public Node ParseAssigment()
+        public NodeStatement ParseAssigmentOrCall()
         {
-            string currentValue;
+            OperationSign currentValue;
 
             Require(TypeLex.Identifier);
             Symbol symVar;
             try
             {
-                symVar = symTableStack.Get(currentLex.value);
+                symVar = symTableStack.Get((string)currentLex.value);
             }
             catch (Exception ex)
             {
                 throw new Exception($"({currentLex.line_number},{currentLex.numLexStart}) {ex.Message}");
             }
-            if (symVar.GetType() != typeof(SymVarGlobal))
+
+            if (!((symVar is SymVarGlobal)||(symVar is SymVarLocal)))
             {
-                throw new Exception($"({currentLex.line_number},{currentLex.numLexStart}) Undefined variable");
+                if (symVar is SymProc)
+                {
+                    return ParseProcedureCall((string)currentLex.value);
+                }
+                throw new Exception($"({currentLex.line_number},{currentLex.numLexStart}) Undefined variable '{symVar.GetName()}'");
             }
-            Node var = new SymVar(currentLex.value, ((SymVar)symVar).GetTypeVar(), new Node(TypeNode.Var, currentLex.value, new List<Node> { })); // var - переменная которая выводится на экран
-            NextLex();
-            if (!(currentLex.typeLex == TypeLex.Operation && (currentLex.value == ":=" || currentLex.value == "*=" || currentLex.value == "/=" || currentLex.value == "+=" || currentLex.value == "-=")))
+            NodeExpression left = ParseFactor(); // var - переменная которая выводится на экран
+            if ((currentLex.value is OperationSign op) && (op == OperationSign.Assignment || op == OperationSign.Addition ||
+                 op == OperationSign.Subtraction || op == OperationSign.Multiplication || op == OperationSign.Division || op == OperationSign.PointRecord))
+            {
+                currentValue = op;
+            }
+            else
             {
                 throw new Exception($"({lexer.line_number},{lexer.numLexStart - 1}) Expected operation sign");
             }
-            currentValue = currentLex.value;
             NextLex();
-            return new AssigmentNode(TypeNode.Assigment, currentValue, new List<Node> { var, ParseSimpleExpression()} );
+            return new AssignmentStmt(currentValue, left, ParseSimpleExpression() );
         }
-        public Node ParseBlock()
+        public NodeStatement ParseProcedureCall(string name)
         {
-            List<Node> stmt = new List<Node> { };
-            Require(TypeLex.Key_Word, "begin");
+            List<NodeExpression?> parameter = new List<NodeExpression?>();
+            SymProc proc;
+            try
+            {
+                proc = (SymProc)symTableStack.Get(name);
+            }
+            catch
+            {
+                throw new Exception($"({lexer.line_number},{lexer.numLexStart - 1}) Procedure not found \"{name}\"");
+            }
+            NextLex();
+            if ((currentLex.value is Separator sep) && (sep == Separator.OpenParenthesis))
+            {
+                NextLex();
+                while (!((currentLex.value is Separator sep2) && (sep2 == Separator.CloseParenthesis)))
+                {
+                    NodeExpression param = ParseSimpleExpression();
+                    parameter.Add(param);
+                    if ((currentLex.value is Separator sep3) && (sep3 == Separator.Comma))
+                    {
+                        NextLex();
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+                Require(Separator.CloseParenthesis);
+                NextLex();
+            }
+            return new CallStmt(proc, parameter);
+        }
+        public BlockStmt ParseBlock()
+        {
+            List<NodeStatement> stmts = new List<NodeStatement> { };
+            Require(KeyWord.BEGIN);
             NextLex();
 
-            while (!(currentLex.typeLex == TypeLex.Key_Word && currentLex.value == "end"))
+            while (!(currentLex.value is KeyWord.END))
             {
-                stmt.Add(ParseStatements());
+                stmts.Add(ParseStatements());
 
-                if (currentLex.typeLex == TypeLex.Separators && currentLex.value == ";")
+                if ((currentLex.value is Separator sep) && (sep == Separator.Semiсolon))
                 {
                     NextLex();
                 }
                 else
                 {
-                    if (!(currentLex.typeLex == TypeLex.Key_Word))
+                    if (!(currentLex.value is KeyWord))
                     {
                         throw new Exception($"({lexer.line_number},{lexer.numLexStart - 1}) Expected ;");
                     }
                 }
             }
-            Require(TypeLex.Key_Word, "end");
+            Require(KeyWord.END);
             NextLex();
 
-            List<Node> children = new List<Node>(stmt);
-
-            return new Node(TypeNode.Block, "begin", children);
+            return new BlockStmt(stmts);
 
         }
-        public Node ParseWhile()
+        public NodeStatement ParseWhile()
         {
-            Require(TypeLex.Key_Word, "while");
+            Require(KeyWord.WHILE);
             NextLex();
-            Node exp = ParseExpression();
-            Require(TypeLex.Key_Word, "do");
+            NodeExpression exp = ParseExpression();
+            Require(KeyWord.DO);
             NextLex();
-            Node stmt = ParseStatements();
+            NodeStatement stmt = ParseStatements();
 
-            return new Node(TypeNode.While, "while", new List<Node> { exp, stmt });
+            return new WhileStmt(exp, stmt);
         }
-        public Node ParseIf()
+        public NodeStatement ParseIf()
         {
-            Require(TypeLex.Key_Word, "if");
+            Require(KeyWord.IF);
             NextLex();
-            Node exp = ParseExpression();
+            NodeExpression condition = ParseExpression();
 
-            Require(TypeLex.Key_Word, "then");
+            Require(KeyWord.THEN);
             NextLex();
-            Node stmt = ParseStatements();
-            if (currentLex.typeLex == TypeLex.Key_Word && currentLex.value == "else")
+            NodeStatement stmt = ParseStatements();
+            NodeStatement elseStmt = new NodeStatement();
+            if ((currentLex.value is KeyWord keyWrd) && (keyWrd == KeyWord.ELSE))
             {
                 NextLex();
-                Node elseStmt = new Node( TypeNode.Else, "else", new List<Node> { ParseStatements() });
-                return new Node(TypeNode.If, "if", new List<Node> { exp, stmt, elseStmt });
+                elseStmt = ParseStatements();
             }
 
-             return new Node(TypeNode.If, "if", new List<Node> { exp, stmt });
+             return new IfStmt(condition, stmt, elseStmt);
 
         }
-        public Node ParseRepeat()
+        public NodeStatement ParseRepeat()
         {
-            List<Node> stmt = new List<Node> { };
+            List<NodeStatement> stmt = new List<NodeStatement> { };
 
-            Require(TypeLex.Key_Word, "repeat");
+            Require(KeyWord.REPEAT);
             NextLex();
 
-            if (!(currentLex.typeLex == TypeLex.Key_Word && currentLex.value == "until"))
+            if (!((currentLex.value is KeyWord keyWrd) && (keyWrd == KeyWord.UNTIL)))
             {
                 stmt.Add(ParseStatements());
             }
-            while (currentLex.typeLex == TypeLex.Separators && currentLex.value == ";")
+            while ((currentLex.value is Separator sep) && (sep == Separator.Semiсolon))
             {
                 NextLex();
-                if (currentLex.typeLex == TypeLex.Key_Word && currentLex.value == "until")
+                if ((currentLex.value is KeyWord keyWrd2) && !(keyWrd2 == KeyWord.UNTIL))
                 {
                     break;
                 }
-                stmt.Add(ParseAssigment());
+                stmt.Add(ParseAssigmentOrCall());
             }
 
-            Require(TypeLex.Key_Word, "until");
+            Require(KeyWord.UNTIL);
             NextLex();
 
-            Node exp = ParseExpression();
-            List<Node> children = new List<Node> (stmt);
-            children.Add (exp);
+            NodeExpression condition = ParseExpression();
 
-            return new Node(TypeNode.Repeat, "repeat", children);
+            return new RepeatStmt(stmt, condition);
         }
-        public Node ParseFor()
+        public NodeStatement ParseFor()
         {
-            
             NextLex();
-            Node stmt = ParseAssigment();
-            //NextLex();
-            if (!(currentLex.typeLex == TypeLex.Key_Word && (currentLex.value == "to" || currentLex.value == "downto")))
+            NodeStatement stmt = ParseAssigmentOrCall();
+            KeyWord ToOrDownto;
+            if (currentLex.value is KeyWord keyWord)
             {
-                throw new Exception($"({lexer.line_number},{lexer.numLexStart - 1}) Expected Key_Word to or downto");
+                if (!(keyWord == KeyWord.TO || keyWord == KeyWord.DOWNTO))
+                {
+                    throw new Exception($"({lexer.line_number},{lexer.numLexStart - 1}) Expected 'to' or 'downto'");
+                }
+                ToOrDownto = (KeyWord)currentLex.value;
+            }
+            else
+            {
+                throw new Exception($"({lexer.line_number},{lexer.numLexStart - 1}) Expected 'to' or 'downto'");
             }
             NextLex();
-            Node to = new Node(TypeNode.To, "to", new List<Node> { ParseSimpleExpression() });
-            Require(TypeLex.Key_Word, "do");
+            NodeExpression to = ParseSimpleExpression();
+            Require(KeyWord.DO);
             NextLex();
-            Node stmt2 = ParseStatements();
+            NodeStatement stmt2 = ParseStatements();
 
-            return new Node(TypeNode.For, "for", new List<Node> { stmt, to, stmt2 });
-
+            return new ForStmt(stmt, ToOrDownto, to, stmt2 );
         }
-        public Node ParseExpression()
+        public NodeExpression ParseExpression()
         {
-            Node left = ParseSimpleExpression();
-            if (currentLex.typeLex == TypeLex.Operation && (currentLex.value == "<" || currentLex.value == "<=" || currentLex.value == ">" || currentLex.value == ">=" || currentLex.value == "=" || currentLex.value == "<>"))
+            NodeExpression left = ParseSimpleExpression();
+            while (currentLex.value is OperationSign op)
             {
-                LexicalAnalyzer.Lex op = currentLex;
-                NextLex();
-                left = new BinOpNode(TypeNode.BinOp, op.value, new List<Node> { left, ParseSimpleExpression() });
+                if (op == OperationSign.Equal || op == OperationSign.NotEqual || op == OperationSign.Less || 
+                    op == OperationSign.LessOrEqual || op == OperationSign.Greater || op == OperationSign.GreaterOrEqual)
+                {
+                    LexicalAnalyzer.Lex opSign = currentLex;
+                    currentLex = lexer.GetLex();
+                    left = new NodeBinOp(opSign.value, left, ParseSimpleExpression());
+                }
+                else
+                {
+                    break;
+                }
             }
             return left;
         }
-        public Node ParseSimpleExpression()
+        public NodeExpression ParseSimpleExpression()
         {
-            Node left = ParseTerm();
-            while (currentLex.typeLex == TypeLex.Operation && (currentLex.value == "+" || currentLex.value == "-" || currentLex.value == "or" || currentLex.value == "xor"))
+            NodeExpression left = ParseTerm();
+            while (currentLex.value is OperationSign op)
             {
-                LexicalAnalyzer.Lex op = currentLex;
-                currentLex = lexer.GetLex();
-                left = new BinOpNode(TypeNode.BinOp, op.value, new List<Node> { left, ParseTerm() });
+                if (op == OperationSign.Plus || op == OperationSign.Minus)
+                {
+                    LexicalAnalyzer.Lex opSign = currentLex;
+                    currentLex = lexer.GetLex();
+                    left = new NodeBinOp(opSign.value, left, ParseTerm());
+                }
+                else
+                {
+                    break;
+                }
             }
             return left;
         }
-        public Node ParseTerm()
+        public NodeExpression ParseTerm()
         {
-            Node left = ParseFactor();
-            while (currentLex.typeLex == TypeLex.Operation && (currentLex.value == "*" || currentLex.value == "/" || currentLex.value == "end"))
+            NodeExpression left = ParseFactor();
+            while (currentLex.value is OperationSign op)
             {
-                LexicalAnalyzer.Lex op = currentLex;
-                currentLex = lexer.GetLex();
-                left = new BinOpNode(TypeNode.BinOp, op.value, new List<Node> { left, ParseFactor() });
+                if (op == OperationSign.Multiply || op == OperationSign.Divide)
+                {
+                    LexicalAnalyzer.Lex opSign = currentLex;
+                    currentLex = lexer.GetLex();
+                    left = new NodeBinOp(opSign.value, left, ParseFactor());
+                }
+                else
+                {
+                    break;
+                }
             }
             return left;
         }
-        public Node ParseFactor()
+        public NodeExpression ParseFactor()
         {
-            if (currentLex.typeLex == TypeLex.Separators && (currentLex.value == "("))
+            if(currentLex.value is Separator sep)
             {
-                currentLex = lexer.GetLex();
+                if (sep == Separator.OpenParenthesis)
+                {
+                    currentLex = lexer.GetLex();
 
-                Node e = ParseExpression();
-                Require(TypeLex.Separators, ")");
-                currentLex = lexer.GetLex();
-                return e;
+                    NodeExpression e = ParseExpression();
+                    Require(Separator.CloseParenthesis);
+                    currentLex = lexer.GetLex();
+                    return e;
+                }
             }
 
             if (currentLex.typeLex == TypeLex.Identifier)
@@ -383,35 +493,35 @@ namespace Compiler
                 Symbol var;
                 try
                 {
-                    var = symTableStack.Get(factor.value);
+                    var = symTableStack.Get((string)factor.value);
                 }
                 catch (Exception ex)
                 {
                     throw new Exception($"({currentLex.line_number},{currentLex.numLexStart}) {ex.Message}");
                 }
-                if(var.GetType() != typeof(SymVarGlobal))
+                if(!((var is SymVarGlobal)||(var is SymVarConst) || (var is SymVarLocal)))
                 {
                     throw new Exception($"({currentLex.line_number},{currentLex.numLexStart}) Undefined variable");
                 }
-                return new SymVar(factor.value, ((SymVar)var).GetTypeVar(), new Node(TypeNode.Var, factor.value, new List<Node> { }));
+                return new NodeVar(new SymVar((string)factor.value, ((SymVar)var).GetTypeVar()));
             }
             if (currentLex.typeLex == TypeLex.Integer)
             {
                 LexicalAnalyzer.Lex factor = currentLex;
                 currentLex = lexer.GetLex();
-                return new SymInteger("integer", new Node(TypeNode.Integer, factor.value, new List<Node> { }));
+                return new NodeInt((int)factor.value);
             }
             if (currentLex.typeLex == TypeLex.String)
             {
                 LexicalAnalyzer.Lex factor = currentLex;
                 currentLex = lexer.GetLex();
-                return new SymString("string", new Node(TypeNode.String, factor.value, new List<Node> { }));
+                return new NodeString((string)factor.value);
             }
             if (currentLex.typeLex == TypeLex.Real)
             {
                 LexicalAnalyzer.Lex factor = currentLex;
                 currentLex = lexer.GetLex();
-                return new SymReal("real", new Node(TypeNode.Real, factor.value, new List<Node> { }));
+                return new NodeReal((double)factor.value);
             }
 
             throw new Exception($"({currentLex.line_number},{currentLex.numLexStart}) ERROR: don't have factor");

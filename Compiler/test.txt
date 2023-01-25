@@ -1,6 +1,12 @@
 program Parser;
-const x = 7;
-var  y: integer;
+procedure a (x : integer);
+var i : integer;
 begin
-  y := x;
+x := 5;
+end;
+var  y: real;
+x : integer;
+begin
+  y := x + 5.5;
+  a(1);
 end.

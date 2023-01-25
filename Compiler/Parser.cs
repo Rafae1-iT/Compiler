@@ -15,7 +15,7 @@ namespace Compiler
             lexer = l;
             currentLex = lexer.GetLex();
         }
-        public Node ParseExpression()
+        /*public Node ParseExpression()
         {
             Node left = ParseTerm();
             while (currentLex.typeLex == TypeLex.Operation && (currentLex.value == "+" || currentLex.value == "-"))
@@ -77,6 +77,6 @@ namespace Compiler
             }
 
             throw new Exception ($"({currentLex.line_number},{currentLex.numLexStart}) expected factor");
-        }
+        }*/
     }
 }

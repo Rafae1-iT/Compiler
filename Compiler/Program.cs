@@ -40,85 +40,23 @@ namespace Compiler
                     {
                         LexicalAnalyzer lexerPar = new LexicalAnalyzer(args[0]);
                         Parser parser = new Parser(lexerPar);
-                        Node ans = parser.ParseExpression();
+                        //Node ans = parser.ParseExpression();
                         if (lexerPar.lastLex.typeLex != TypeLex.Eof)
                         {
                             throw new Exception($"({lexerPar.lastLex.line_number},{lexerPar.lastLex.numLexStart}) ERROR: expected factor");
                         }
-                        void PrintNode(Node? node, int tab = 0, bool isLeft = true)
-                        {
-                            if (node != null)
-                            {
-                                for (int i = 0; i < tab - 1; i++)
-                                {
-                                    Console.Write("    ");
-                                }
-                                if (tab > 0)
-                                {
-                                    if (isLeft)
-                                    {
-                                        Console.Write("├───");
-                                    }
-                                    else
-                                    {
-                                        Console.Write("└───");
-                                    }
-                                }
-                                tab += 1;
-                                Console.WriteLine(node.value);
-                                if (node.children.Count > 0)
-                                {
-                                    PrintNode(node.children[0], tab, true);
-                                }
-                                if (node.children.Count > 1)
-                                {
-                                    PrintNode(node.children[1], tab, false);
-                                }
-                            }
-                        }
-                        PrintNode(ans);
+                        //ans.ToPrint();
                     }
                     if (args.Contains("-bparser"))
                     {
                         LexicalAnalyzer lexerPar = new LexicalAnalyzer(args[0]);
                         BigParser parser = new BigParser(lexerPar);
-                        Node ans = parser.ParseProgram();
+                        NodeMainProgram ans = parser.ParseMainProgram();
                         if (lexerPar.lastLex.typeLex != TypeLex.Eof)
                         {
                             throw new Exception($"({lexerPar.lastLex.line_number},{lexerPar.lastLex.numLexStart}) ERROR: program is over");
                         }
-                        void PrintNode(Node? node, int tab = 0, bool isLeft = true)
-                        {
-                            if (node != null)
-                            {
-                                for (int i = 0; i < tab - 1; i++)
-                                {
-                                    Console.Write("    ");
-                                }
-                                if (tab > 0)
-                                {
-                                    if (isLeft)
-                                    {
-                                        Console.Write("├─── ");
-                                    }
-                                    else
-                                    {
-                                        Console.Write("└─── ");
-                                    }
-                                }
-                                tab += 1;
-                                Console.WriteLine(node.value);
-                                for (int i = 0; i < node.children.Count - 1; i++)
-                                {
-                                    PrintNode(node.children[i], tab, true);
-                                }
-                                if(node.children.Count > 0)
-                                {
-                                    PrintNode(node.children[^1], tab, false);
-                                }
-                            }
-                        }
-                        PrintNode(ans);
+                        Console.WriteLine(ans.ToPrint(""));
                     }
                 }
                 catch (Exception e)
@@ -134,7 +72,6 @@ namespace Compiler
                 Console.WriteLine("Options:");
                 Console.WriteLine("  -lexer       lexical parser");
                 Console.WriteLine("  -sparser      simple expression parser");
-                return;
             }
         }
     }

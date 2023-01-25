@@ -21,6 +21,121 @@ namespace Compiler
         Operation,
         Separators
     }
+    public enum KeyWord
+    {
+        Unidentified,
+        AND,
+        ARRAY,
+        AS,
+        ASM,
+        BEGIN,
+        CASE,
+        CONST,
+        CONSTRUCTOR,
+        DESTRUCTOR,
+        DIV,
+        DO,
+        DOWNTO,
+        ELSE,
+        END,
+        FILE,
+        FOR,
+        FOREACH,
+        FUNCTION,
+        GOTO,
+        IMPLEMENTATION,
+        IF,
+        IN,
+        INHERITED,
+        INLINE,
+        INTERFACE,
+        LABEL,
+        MOD,
+        NIL,
+        NOT,
+        OBJECT,
+        OF,
+        OPERATOR,
+        OR,
+        PACKED,
+        PROCEDURE,
+        PROGRAM,
+        RECORD,
+        REPEAT,
+        SELF,
+        SET,
+        SHL,
+        SHR,
+        STRING,
+        THEN,
+        TO,
+        TYPE,
+        UNIT,
+        UNTIL,
+        USES,
+        VAR,
+        WHILE,
+        WITH,
+        XOR,
+        DISPOSE,
+        EXIT,
+        FALSE,
+        NEW,
+        TRUE,
+        CLASS,
+        DISPINTERFACE,
+        EXCEPT,
+        EXPORTS,
+        FINALIZATION,
+        FINALLY,
+        INITIALIZATION,
+        IS,
+        LIBRARY,
+        ON,
+        OUT,
+        PROPERTY,
+        RAISE,
+        RESOURCESTRING,
+        THREADVAR,
+        TRY
+    }
+    public enum OperationSign
+    {
+        Unidentified,
+        Equal, // =
+        Colon, // :
+        Plus, // +
+        Minus, // -
+        Multiply, // *
+        Divide, // /
+        Greater, //>
+        Less, //<
+        At, // @
+        BitwiseShiftToTheLeft, // <<
+        BitwiseShiftToTheRight, //>>
+        NotEqual, //<>
+        SymmetricalDifference, // ><
+        LessOrEqual, // <=
+        GreaterOrEqual, // >=
+        Assignment, // :=
+        Addition, // +=
+        Subtraction, // -=
+        Multiplication, // *=
+        Division, // /=
+        PointRecord, // .
+    }
+    public enum Separator
+    {
+        Unidentified,
+        Comma, // ,
+        Semiсolon, // ;
+        OpenParenthesis, // (
+        CloseParenthesis, // )
+        OpenBracket, // [
+        CloseBracket, // ]
+        Point, // .
+        DoublePoint // ..
+    }
     public class LexicalAnalyzer
     {
         public struct Lex
@@ -28,10 +143,10 @@ namespace Compiler
             public int line_number;
             public int numLexStart;
             public TypeLex typeLex;
-            public string value;
+            public object value;
             public string lex;
 
-            public Lex(int line_number, int numLexStart, TypeLex typeLex, string value, string lex)
+            public Lex(int line_number, int numLexStart, TypeLex typeLex, object value, string lex)
             {
                 this.line_number = line_number;
                 this.numLexStart = numLexStart;
@@ -345,7 +460,7 @@ namespace Compiler
             if (line_number <= input.Count)
             {
                 TypeLex typeLex = LexicalAnalyzer.GetTypeLex(input[line_number - 1], ref lenLex, numLexStart);
-                string value = LexicalAnalyzer.GetValue(input[line_number - 1].Substring(0, lenLex), ref typeLex);
+                object value = LexicalAnalyzer.GetValue(input[line_number - 1].Substring(0, lenLex), ref typeLex);
 
                 if (typeLex == TypeLex.Error)
                 {
@@ -373,7 +488,7 @@ namespace Compiler
             return lex;
         }
 
-        public static string GetValue(string lexem, ref TypeLex typeLexem)
+        public static object GetValue(string lexem, ref TypeLex typeLexem)
         {
             if (typeLexem == TypeLex.Integer && lexem[0] == '%')
             {
@@ -390,7 +505,7 @@ namespace Compiler
                     return a;
                 }
                 typeLexem = TypeLex.Integer;
-                return value.ToString();
+                return value;
 
             }
 
@@ -410,7 +525,7 @@ namespace Compiler
                     return a;
                 }
                 typeLexem = TypeLex.Integer;
-                return value.ToString();
+                return value;
             }
 
             if (typeLexem == TypeLex.Integer)
@@ -427,7 +542,7 @@ namespace Compiler
                     return a;
                 }
                 typeLexem = TypeLex.Integer;
-                return value.ToString();
+                return value;
             }
 
             if (typeLexem == TypeLex.Integer && lexem[0] == '$')
@@ -445,7 +560,7 @@ namespace Compiler
                     return a;
                 }
                 typeLexem = TypeLex.Integer;
-                return value.ToString();
+                return value;
             }
 
             if (typeLexem == TypeLex.Real) // убираем не значащие 0
@@ -467,10 +582,9 @@ namespace Compiler
             if (typeLexem == TypeLex.Real) // перевод real
             {
                 double valueReal = 0;
-                string value = "";
                 lexem = lexem.Replace(".", ",");
                 valueReal = Convert.ToDouble(lexem);
-                return value = valueReal.ToString("E10").Replace(",", ".");
+                return valueReal;
             }
 
             if (typeLexem == TypeLex.Integer) // убираем не значащие 0
@@ -491,15 +605,102 @@ namespace Compiler
 
             if (typeLexem == TypeLex.String)
             {
-                var value = lexem.Replace("'", ""); ;
-                return value.ToString();
+                string value = lexem.Replace("'", "");
+                return value;
             }
-
-            /*if (typeLexem == "endFile")
+            if (typeLexem == TypeLex.Key_Word)
             {
-                var value = lexem.ToLower();
-                return value.ToString();
-            }*/
+                lexem = lexem.ToLower();
+                switch (lexem)
+                {
+                    case "end":
+                        return KeyWord.END;
+                    case "begin":
+                        return KeyWord.BEGIN;
+                    case "const":
+                        return KeyWord.CONST;
+                    case "var":
+                        return KeyWord.VAR;
+                    case "program":
+                        return KeyWord.PROGRAM;
+                    case "procedure":
+                        return KeyWord.PROCEDURE;
+                    default:
+                        return KeyWord.Unidentified;
+                }
+            }
+            if (typeLexem == TypeLex.Operation)
+            {
+                switch (lexem)
+                {
+                    case "=":
+                        return OperationSign.Equal;
+                    case ":":
+                        return OperationSign.Colon;
+                    case "+":
+                        return OperationSign.Plus;
+                    case "-":
+                        return OperationSign.Minus;
+                    case "*":
+                        return OperationSign.Multiply;
+                    case "/":
+                        return OperationSign.Divide;
+                    case ">":
+                        return OperationSign.Greater;
+                    case "<":
+                        return OperationSign.Less;
+                    case "@":
+                        return OperationSign.At;
+                    case "<<":
+                        return OperationSign.BitwiseShiftToTheLeft;
+                    case ">>":
+                        return OperationSign.BitwiseShiftToTheRight;
+                    case "<>":
+                        return OperationSign.NotEqual;
+                    case "><":
+                        return OperationSign.SymmetricalDifference;
+                    case "<=":
+                        return OperationSign.LessOrEqual;
+                    case ">=":
+                        return OperationSign.GreaterOrEqual;
+                    case ":=":
+                        return OperationSign.Assignment;
+                    case "+=":
+                        return OperationSign.Addition;
+                    case "-=":
+                        return OperationSign.Subtraction;
+                    case "*=":
+                        return OperationSign.Multiplication;
+                    case "/=":
+                        return OperationSign.Division;
+                    default:
+                        return OperationSign.Unidentified;
+                }
+            }
+            if (typeLexem == TypeLex.Separators)
+            {
+                switch (lexem)
+                {
+                    case ",":
+                        return Separator.Comma;
+                    case ";":
+                        return Separator.Semiсolon;
+                    case "(":
+                        return Separator.OpenParenthesis;
+                    case ")":
+                        return Separator.CloseParenthesis;
+                    case "[":
+                        return Separator.OpenBracket;
+                    case "]":
+                        return Separator.CloseBracket;
+                    case ".":
+                        return Separator.Point;
+                    case "..":
+                        return Separator.DoublePoint;
+                    default:
+                        return Separator.Unidentified;
+                }
+            }
 
             return lexem;
         }

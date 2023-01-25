@@ -120,7 +120,7 @@ namespace Compiler
                             {
                                 LexicalAnalyzer lexerPar = new LexicalAnalyzer(pathIn);
                                 BigParser parser = new BigParser(lexerPar);
-                                Node ans = parser.ParseProgram();
+                                Node ans = parser.ParseMainProgram();
                                 if (lexerPar.lastLex.typeLex != TypeLex.Eof)
                                 {
                                     throw new Exception($"({lexerPar.lastLex.line_number},{lexerPar.lastLex.numLexStart}) ERROR: program is over");
@@ -162,7 +162,7 @@ namespace Compiler
                             {
                                 LexicalAnalyzer lexerPar = new LexicalAnalyzer(pathIn);
                                 BigParser parser = new BigParser(lexerPar);
-                                Node ans = parser.ParseProgram();
+                                Node ans = parser.ParseMainProgram();
                                 if (lexerPar.lastLex.typeLex != TypeLex.Eof)
                                 {
                                     throw new Exception($"({lexerPar.lastLex.line_number},{lexerPar.lastLex.numLexStart}) ERROR: program is over");
